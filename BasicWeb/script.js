@@ -248,10 +248,23 @@ cleatCanvas.addEventListener("click", () => {
 })
 
 saveImage.addEventListener("click", () => {
-    const link = document.createElement("a");
-    link.download = `${Date.now()}`.jpg;
-    link.href = canvas.toDataURL();
-    link.click();
+    const target = document.querySelector('.drawing-board');
+    if (window.html2canvas) {
+        html2canvas(target).then(domCanvas => {
+            const link = document.createElement('a');
+            link.download = `lantern-${Date.now()}.png`;
+            link.href = domCanvas.toDataURL('image/png');
+            link.click();
+        }).catch(err => {
+            console.error('html2canvas error:', err);
+        });
+    } else {
+        // fallback to exporting only the raw canvas
+        const link = document.createElement("a");
+        link.download = `lantern-${Date.now()}.png`;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+    }
 })
 
 canvas.addEventListener("mousedown", startDraw);
