@@ -1,13 +1,13 @@
 const canvas = 
     document.querySelector("canvas"),
 toolBtns = 
-    document.querySelectorAll(".tool"),
+    document.querySelectorAll(".toolbar-option.tool"),
 fillColor = 
     document.querySelector("#fill-color"),
 sizeSlider = 
     document.querySelector("#size-slider"),
 colorBtns = 
-    document.querySelectorAll(".colors .option"),
+    document.querySelectorAll(".toolbar-color"),
 colorPicker = 
     document.querySelector("#color-picker"),
 cleatCanvas = 
@@ -20,6 +20,7 @@ ctx = canvas.getContext("2d");
 let prevMouseX, prevMouseY, snapshot,
     isDrawing = false,
     selectedTool = "brush",
+    previousTool = "brush",
     brushWidth = 5,
     selectedColor = "#000";
 
@@ -38,6 +39,11 @@ window.addEventListener("load", () => {
     canvas.width = canvas.offsetWidth;
     canvas.height = canvas.offsetHeight;
     setCanvasBackground();
+    // initialize selectedColor from toolbar swatch if present
+    const initSwatch = document.querySelector('.toolbar-color.selected');
+    if (initSwatch) {
+        selectedColor = initSwatch.dataset.color || window.getComputedStyle(initSwatch).getPropertyValue('background-color');
+    }
 });
 
 const drawRect = (e) => {
@@ -82,41 +88,6 @@ const drawSquare = (e) => {
     fillColor.checked ? ctx.fill() : ctx.stroke();
 }
 
-// Function to draw a hexagon
-const drawHexagon = (e) => {
-    const sideLength =
-    Math.abs(prevMouseX - e.offsetX);
-    ctx.beginPath();
-    for (let i = 0; i < 6; i++) {
-        const angle = (2 * Math.PI / 6) * i;
-        const x = e.offsetX + sideLength 
-        * Math.cos(angle);
-        const y = e.offsetY + sideLength 
-        * Math.sin(angle);
-        ctx.lineTo(x, y);
-    }
-    ctx.closePath();
-    fillColor.checked ? ctx.fill() : ctx.stroke();
-}
-
-// Function to draw a pentagon
-const drawPentagon = (e) => {
-    const sideLength = 
-    Math.abs(prevMouseX - e.offsetX);
-    ctx.beginPath();
-    for (let i = 0; i < 5; i++) {
-        const angle = (2 * Math.PI / 5) * 
-        i - Math.PI / 2;
-        const x = e.offsetX + sideLength 
-        * Math.cos(angle);
-        const y = e.offsetY + sideLength 
-        * Math.sin(angle);
-        ctx.lineTo(x, y);
-    }
-    ctx.closePath();
-    fillColor.checked ? ctx.fill() : ctx.stroke();
-}
-
 const drawLine = (e) => {
     ctx.beginPath();
     ctx.moveTo(prevMouseX, prevMouseY);
@@ -124,32 +95,40 @@ const drawLine = (e) => {
     ctx.stroke();
 }
 
-const drawArrow = (e) => {
-    const headLength = 10;
-    const angle = Math.atan2(e.offsetY - prevMouseY,
-    e.offsetX - prevMouseX);
-    ctx.beginPath();
-    ctx.moveTo(prevMouseX, prevMouseY);
-    ctx.lineTo(e.offsetX, e.offsetY);
-    ctx.stroke();
-
-    // Draw arrowhead
-    ctx.beginPath();
-    ctx.moveTo(e.offsetX - headLength * 
-    Math.cos(angle - Math.PI / 6), 
-    e.offsetY - headLength * 
-    Math.sin(angle - Math.PI / 6));
-    ctx.lineTo(e.offsetX, e.offsetY);
-    ctx.lineTo(e.offsetX - headLength * 
-    Math.cos(angle + Math.PI / 6),
-    e.offsetY - headLength * 
-    Math.sin(angle + Math.PI / 6));
-    ctx.closePath();
-    ctx.fill();
+const pickColor = (e) => {
+    const imageData = ctx.getImageData(e.offsetX, e.offsetY, 1, 1);
+    const data = imageData.data;
+    const hex = '#' + [data[0], data[1], data[2]].map(x => x.toString(16).padStart(2, '0')).join('').toUpperCase();
+    
+    // Update the custom color
+    const customSwatch = document.querySelector('.toolbar-color.custom-color');
+    customSwatch.style.background = hex;
+    customColorManager.colorPicker.value = hex;
+    
+    // Select the custom color and update drawing color
+    const prev = document.querySelector('.toolbar-color.selected');
+    if (prev) prev.classList.remove('selected');
+    customSwatch.classList.add('selected');
+    selectedColor = hex;
+    
+    // Switch back to the previous tool
+    const eyedropperTool = document.querySelector('#eyedropper');
+    const previousToolElement = document.querySelector(`#${previousTool}`);
+    
+    eyedropperTool.classList.remove('active');
+    previousToolElement.classList.add('active');
+    selectedTool = previousTool;
 }
 
 
+
 const startDraw = (e) => {
+    // If eyedropper, just pick the color and don't start drawing
+    if (selectedTool === "eyedropper") {
+        pickColor(e);
+        return;
+    }
+    
     isDrawing = true;
     prevMouseX = e.offsetX; 
     prevMouseY = e.offsetY;
@@ -199,6 +178,8 @@ const drawing = (e) => {
         drawLine(e);
     } else if (selectedTool === "arrow") {
         drawArrow(e);
+    } else if (selectedTool === "eyedropper") {
+        pickColor(e);
     } else if (selectedTool === "curve") {
         drawCurve(e);
     }
@@ -211,9 +192,14 @@ const drawing = (e) => {
 
 toolBtns.forEach(btn => {
     btn.addEventListener("click", () => {
-        document.querySelector(".options .active")
-        .classList.remove("active");
+        const prev = document.querySelector(".toolbar-option.tool.active");
+        if (prev) prev.classList.remove("active");
         btn.classList.add("active");
+        
+        // Store previous tool if not switching from eyedropper
+        if (selectedTool !== "eyedropper") {
+            previousTool = selectedTool;
+        }
         selectedTool = btn.id;
         console.log(selectedTool);
 
@@ -221,25 +207,106 @@ toolBtns.forEach(btn => {
 
 });
 
-sizeSlider.addEventListener("change", () => 
+// fill toggle (droplet) - sync with hidden checkbox #fill-color
+const fillToggle = document.querySelector('#fill-toggle');
+if (fillToggle) {
+    // reflect initial state
+    if (fillColor && fillColor.checked) fillToggle.classList.add('active');
+    fillToggle.addEventListener('click', (ev) => {
+        // toggle the hidden checkbox value
+        if (fillColor) {
+            fillColor.checked = !fillColor.checked;
+            fillToggle.classList.toggle('active', fillColor.checked);
+        } else {
+            // fallback: toggle class
+            fillToggle.classList.toggle('active');
+        }
+    });
+}
+
+    sizeSlider.addEventListener("change", () => 
     brushWidth = sizeSlider.value)
 
 colorBtns.forEach(btn => {
     btn.addEventListener("click", () => {
-        document.querySelector(".options .selected")
-        .classList.remove("selected");
+        const prev = document.querySelector(".toolbar-color.selected");
+        if (prev) prev.classList.remove("selected");
         btn.classList.add("selected"); 
         selectedColor = window.getComputedStyle(btn)
         .getPropertyValue("background-color");
     });
 });
 
+// helper: convert rgb(...) to #rrggbb; leaves hex strings as-is
+function rgbToHex(color) {
+    if (!color) return color;
+    color = color.trim();
+    if (color.startsWith('#')) return color;
+    const m = color.match(/rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/i);
+    if (!m) return color;
+    return '#' + [1,2,3].map(i => parseInt(m[i]).toString(16).padStart(2,'0')).join('');
+}
 
-colorPicker.addEventListener("change", () => {
-    colorPicker.parentElement.style.background = 
-    colorPicker.value;
-    colorPicker.parentElement.click();
-});
+
+// Custom Color Manager Class
+class CustomColorManager {
+    constructor() {
+        this.colorPicker = document.querySelector('#color-picker');
+        this.customSwatch = document.querySelector('.toolbar-color.custom-color');
+        this.editBtn = document.querySelector('#edit-color');
+        this.isPickerOpen = false;
+        
+        this.init();
+    }
+
+    init() {
+        // When color changes, update swatch and selection
+        this.colorPicker.addEventListener('change', (e) => {
+            this.updateSwatch(e.target.value);
+        });
+
+        // Custom swatch click = select only, don't open picker
+        this.customSwatch.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.selectCustomColor();
+        });
+
+        // Edit button click = open color picker
+        this.editBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.openPicker();
+        });
+    }
+
+    updateSwatch(hexColor) {
+        this.customSwatch.style.background = hexColor;
+        this.selectCustomColor();
+        selectedColor = hexColor;
+    }
+
+    selectCustomColor() {
+        const prev = document.querySelector('.toolbar-color.selected');
+        if (prev) prev.classList.remove('selected');
+        this.customSwatch.classList.add('selected');
+    }
+
+    openPicker() {
+        // Remove pointer-events restriction temporarily
+        this.colorPicker.style.pointerEvents = 'auto';
+        this.colorPicker.click();
+        
+        // Re-apply restriction after picker closes
+        setTimeout(() => {
+            this.colorPicker.style.pointerEvents = 'none';
+        }, 50);
+    }
+}
+
+// Initialize custom color manager
+const customColorManager = new CustomColorManager();
+
+// Hide the color picker input by default
+colorPicker.style.pointerEvents = 'none';
 
 cleatCanvas.addEventListener("click", () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height)
