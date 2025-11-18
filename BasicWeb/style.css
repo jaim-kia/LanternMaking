@@ -1,29 +1,37 @@
 body {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 100vh;
+    min-height: 100vh; /* Changed from height: 100vh */
+    width: 100%;
     background-color: #e3dede;
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    overflow-x: hidden; /* Prevent horizontal scroll */
 }
 
 .container {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    max-width: 1050px;
     width: 100%;
     border-radius: 20px;
+    height: 100%;
 }
 
 .tools-board-top {
-    /* width: 100%; */
     background-color: #f8f7f6;
     border-radius: 20px;
     padding: 12px 15px;
+    margin: 12px 0px;
+    position: fixed;
+    top: 0;
+    z-index: 1000;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 .toolbar-horizontal {
@@ -90,18 +98,6 @@ body {
     position: relative;
 }
 
-.toolbar-color .swatch-picker {
-    opacity: 0;
-    cursor: pointer;
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    border: none;
-    padding: 0;
-    margin: 0;
-}
-
 .toolbar-color.selected {
     border-color: rgba(0,0,0,1);
 }
@@ -121,17 +117,12 @@ body {
     margin: 0;
     background: transparent;
     cursor: pointer;
+    border-radius: 50%;
     -webkit-appearance: none;
 }
 
 .toolbar-color.custom-color input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
 .toolbar-color.custom-color input[type="color"]::-webkit-color-swatch { border: none; border-radius: 50%; }
-
-/* hidden per-swatch input (covers swatch area so the user can interact if desired) */
-.option #color-picker {
-    opacity: 0;
-    /* removed; custom-color swatch now editable via all swatches */
-}
 
 .toolbar-separator {
     width: 1px;
@@ -140,185 +131,58 @@ body {
     margin: 0 4px;
 }
 
-.tools-board {
-    width: 210px;
-    height: 590px;
-    border-radius: 20px;
-    background-color: #f8f7f6;
-    padding: 15px 22px 0;
-}
-
-.tools-board .row {
-    margin-bottom: 20px;
-}
-
-.row .options {
-    list-style: none;
-    margin: 10px 0 0 5px;
-}
-
-.row .options .option {
-    display: flex;
-    cursor: pointer;
-    align-items: center;
-    margin-bottom: 10px;
-}
-
-.option:is(:hover, .active) img {
-    filter: grayscale(20%);
-}
-
-.option :where(span, label) {
-    color: black;
-    cursor: pointer;
-    padding-left: 10px;
-}
-
-.option:is(:hover, .active) :where(span, label) {
-    color: #f4130b;
-}
-
-.option #fill-color {
-    height: 14px;
-    cursor: pointer;
-    width: 14px;
-}
-
-#fill-color:checked~label {
-    color: #e93e2b;
-}
-
-.option #size-slider {
-    width: 100%;
-    height: 5px;
-    margin-top: 10px;
-}
-
-.colors .options {
-    display: flex;
-    justify-content: space-between;
-}
-
-.colors .option {
-    height: 20px;
-    width: 20px;
-    border-radius: 30%;
-    margin-top: 3px;
-    position: relative;
-}
-
-.colors .option:nth-child(1) {
-    background-color: #fff;
-    border: 1px solid #bfbfbf;
-}
-
-.colors .option:nth-child(2) {
-    background-color: black;
-}
-
-.colors .option:nth-child(3) {
-    background-color: #ef4415;
-}
-
-.colors .option:nth-child(4) {
-    background-color: green;
-}
-
-.colors .option:nth-child(5) {
-    background-color: #c1f40a;
-}
-
-.colors .option.selected::before {
-    position: absolute;
-    content: "";
-    height: 12px;
-    top: 50%;
-    left: 50%;
-    width: 12px;
-    background: inherit;
-    border-radius: inherit;
-    border: 2px solid #fff;
-    transform: translate(-50%, -50%);
-}
-
-.colors .option:first-child.selected::before {
-    border-color: #ccc;
-}
-
-/* (toolbar-color defined above; input styles appended below) */
-
-.buttons button {
-    width: 80%;
-    color: #fff;
-    border: none;
-    outline: none;
-    font-size: 0.9rem;
-    padding: 3px 0;
-    margin-bottom: 13px;
-    background: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.buttons .clear-canvas {
-    color: black;
-    border: 1px solid #9fc39f;
-    transition: all 0.2s ease;
-    border: 2px solid black;
-    font-size: 13px;
-}
-
-.clear-canvas:hover {
-    color: #fff;
-    background: #6c757d;
-}
-
-.buttons .save-img {
-    background: white;
-    color: black;
-    border: 1px solid #6c757d;
-}
-
 .drawing-board {
-    position: relative;
-    flex: 0 0 auto;
+    position: relative; /* Changed from fixed */
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #2f7528; /* background behind the rounded canvas */
-    border-width: 1000px;
-    border-radius: 20px;
-    padding: 18px; /* space around canvas so rounded corners are visible */
-    /* overflow: hidden;  */
-    height: 900px;
-
-    /* width: min(720px, 90%); */
-    width: 600px;
-    overflow: visible;
-    margin: 0 auto;
+    background: #2f7528;
+    height: 100vh; /* Full viewport height */
+    width: 100%;
+    overflow: hidden; /* Prevent any overflow */
 }
 
-.drawing-board canvas {
-    position: relative;
-    top: -215px;
+canvas {
+    position: absolute;
     z-index: 1;
     width: 800px;
     height: 900px;
+    max-width: 90vw; /* Responsive max width */
+    max-height: 90vh; /* Responsive max height */
     display: block;
     margin: 0 auto;
     border-radius: 1500px;
+    top: calc(50% - 450px + 205px);
 }
 
-.frame-overlay {
+/* Lantern images positioned relative to the canvas */
+.lantern-top,
+.lantern-bottom,
+.lantern-tassel {
     position: absolute;
-    top: 0;
     left: 50%;
     transform: translateX(-50%);
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
     pointer-events: none;
-    z-index: 3;
+    z-index: 2; /* Above canvas but below toolbar */
+    object-fit: contain;
+}
+
+.lantern-top {
+    top: calc(50% - 450px + 100px); /* Align with canvas top */
+    width: 300px;
+    max-width: 37.5%; /* Relative to canvas width (300/800 = 37.5%) */
+}
+
+.lantern-bottom {
+    top: calc(50% - 450px + 465px); /* Align with canvas position */
+    width: 300px;
+    max-width: 37.5%; /* Relative to canvas width */
+}
+
+.lantern-tassel {
+    top: calc(50% - 450px + 500px); /* Align with canvas position */
+    width: 80px;
+    max-width: 10%; /* Relative to canvas width (80/800 = 10%) */
 }
 
 /* Controls placed under the canvas */
@@ -327,7 +191,15 @@ body {
     gap: 12px;
     justify-content: center;
     align-items: center;
-    margin: 12px 0 24px;
+    margin: 12px 0px;
+    position: fixed;
+    bottom: 0;
+    z-index: 1000;
+    background-color: #f8f7f6;
+    border-radius: 20px;
+    padding: 12px 15px;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 .canvas-controls button {
@@ -352,30 +224,51 @@ body {
     border: 1px solid #6c757d;
 }
 
-.lantern-top,
-.lantern-bottom,
-.lantern-tassel {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    pointer-events: none;
-    z-index: 3;
-    object-fit: contain;
-    scale: 100%;
+/* Responsive adjustments */
+@media (max-width: 900px) {
+    .drawing-board canvas {
+        width: 700px;
+        height: 800px;
+    }
+    
+    .lantern-top {
+        top: calc(50% - 400px + 0px);
+    }
+    
+    .lantern-bottom {
+        top: calc(50% - 400px + 320px);
+    }
+    
+    .lantern-tassel {
+        top: calc(50% - 400px + 355px);
+    }
 }
 
-.lantern-top {
-    top: 0px;
-    width: 300px;
+@media (max-width: 768px) {
+    .drawing-board canvas {
+        width: 600px;
+        height: 700px;
+        max-width: 95vw;
+        max-height: 80vh;
+    }
+    
+    .lantern-top {
+        top: calc(50% - 350px + 0px);
+        max-width: 50%;
+    }
+    
+    .lantern-bottom {
+        top: calc(50% - 350px + 280px);
+        max-width: 50%;
+    }
+    
+    .lantern-tassel {
+        top: calc(50% - 350px + 310px);
+        max-width: 13.5%;
+    }
+    
+    .toolbar-options {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
 }
-
-.lantern-bottom {
-    top: 365px;
-    width: 300px;
-}
-
-.lantern-tassel {
-    top: 400px;
-    width: 80px;
-}
-

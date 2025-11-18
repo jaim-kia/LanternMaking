@@ -22,86 +22,81 @@
 </head>
 
 <body>
+    <section class="tools-board-top">
+        <div class="toolbar-horizontal">
+            <ul class="toolbar-options">
+                <li class="toolbar-option tool" id="pencil" title="Pencil">
+                    <i class="fas fa-pencil"></i>
+                </li>
+                <li class="toolbar-option active tool" id="brush" title="Brush">
+                    <i class="fas fa-brush"></i>
+                </li>
+                <li class="toolbar-option tool" id="eraser" title="Eraser">
+                    <i class="fas fa-eraser"></i>
+                </li>
+                <li class="toolbar-separator"></li>
+                <li class="toolbar-option tool" id="square" title="Rectangle">
+                    <i class="far fa-square"></i>
+                </li>
+                <li class="toolbar-option tool" id="circle" title="Circle">
+                    <i class="fa-regular fa-circle"></i>
+                </li>
+                <li class="toolbar-option tool" id="triangle" title="Triangle">
+                    <i class="fa-solid fa-mountain"></i>
+                </li>
+                <li class="toolbar-option tool" id="line" title="Line">
+                    <i class="fa-solid fa-grip-lines"></i>
+                </li>
+                <li class="toolbar-option tool" id="eyedropper" title="Eyedropper">
+                    <i class="fa-solid fa-eyedropper"></i>
+                </li>
+
+                <li class="toolbar-separator"></li>
+
+                <!-- preset color swatches -->
+                <li class="toolbar-color option selected" data-color="#D64731" title="Red" style="background:#D64731"></li>
+                <li class="toolbar-color option" data-color="#E0C960" title="Yellow" style="background:#E0C960"></li>
+                <li class="toolbar-color option" data-color="#2774C4" title="Blue" style="background:#2774C4"></li>
+                
+                <li class="toolbar-separator"></li>
+
+                <!-- custom color swatch with edit button -->
+                <li class="toolbar-color option custom-color" title="Custom color" style="background:#FF8C00">
+                    <input type="color" id="color-picker" value="#FF8C00">
+                </li>
+                <li class="toolbar-option" id="edit-color" title="Edit custom color">
+                    <i class="fa-solid fa-palette"></i>
+                </li>
+
+                <li class="toolbar-separator"></li>
+
+                <!-- Fill toggle (droplet) - toggles hidden #fill-color checkbox -->
+                <li class="toolbar-option" id="fill-toggle" title="Fill">
+                    <i class="fa-solid fa-tint"></i>
+                    <input type="checkbox" id="fill-color" hidden>
+                </li>
+
+                <li class="option">
+                    <input type="range" id="size-slider" min="1" 
+                            max="30" value="5">
+                </li>
+            </ul>
+        </div>
+    </section>
+
     <div class="container">
-        <section class="tools-board-top">
-            <div class="toolbar-horizontal">
-                <ul class="toolbar-options">
-                    <li class="toolbar-option tool" id="pencil" title="Pencil">
-                        <i class="fas fa-pencil"></i>
-                    </li>
-                    <li class="toolbar-option active tool" id="brush" title="Brush">
-                        <i class="fas fa-brush"></i>
-                    </li>
-                    <li class="toolbar-option tool" id="eraser" title="Eraser">
-                        <i class="fas fa-eraser"></i>
-                    </li>
-                    <li class="toolbar-separator"></li>
-                    <li class="toolbar-option tool" id="square" title="Rectangle">
-                        <i class="far fa-square"></i>
-                    </li>
-                    <li class="toolbar-option tool" id="circle" title="Circle">
-                        <i class="fa-regular fa-circle"></i>
-                    </li>
-                    <li class="toolbar-option tool" id="triangle" title="Triangle">
-                        <i class="fa-solid fa-mountain"></i>
-                    </li>
-                    <li class="toolbar-option tool" id="line" title="Line">
-                        <i class="fa-solid fa-grip-lines"></i>
-                    </li>
-                    <li class="toolbar-option tool" id="eyedropper" title="Eyedropper">
-                        <i class="fa-solid fa-eyedropper"></i>
-                    </li>
-
-                    <li class="toolbar-separator"></li>
-
-                    <!-- preset color swatches -->
-                    <li class="toolbar-color option selected" data-color="#D64731" title="Red" style="background:#D64731"></li>
-                    <li class="toolbar-color option" data-color="#E0C960" title="Yellow" style="background:#E0C960"></li>
-                    <li class="toolbar-color option" data-color="#2774C4" title="Blue" style="background:#2774C4"></li>
-                    
-                    <li class="toolbar-separator"></li>
-
-                    <!-- custom color swatch with edit button -->
-                    <li class="toolbar-color option custom-color" title="Custom color" style="background:#FF8C00">
-                        <input type="color" id="color-picker" value="#FF8C00">
-                    </li>
-                    <li class="toolbar-option" id="edit-color" title="Edit custom color">
-                        <i class="fa-solid fa-palette"></i>
-                    </li>
-
-                    <li class="toolbar-separator"></li>
-
-                    <!-- Fill toggle (droplet) - toggles hidden #fill-color checkbox -->
-                    <li class="toolbar-option" id="fill-toggle" title="Fill">
-                        <i class="fa-solid fa-tint"></i>
-                        <input type="checkbox" id="fill-color" hidden>
-                    </li>
-
-                    <li class="option">
-                        <input type="range" id="size-slider" min="1" 
-                                max="30" value="5">
-                    </li>
-                </ul>
-            </div>
-        </section>
-
         <section class="drawing-board">
             <canvas></canvas>
             <img src="\Assets\Lantern\lantern-top.png" class="lantern-top">
             <img src="\Assets\Lantern\lantern-tassel.png" class="lantern-tassel">
             <img src="\Assets\Lantern\lantern-bottom.png" class="lantern-bottom">
-
         </section>
-
-        <!-- moved canvas controls below the canvas -->
-        <div class="canvas-controls">
-            <button class="clear-canvas">Clear Canvas</button>
-            <button class="save-img">Save As Image</button>
-        </div>
-
     </div>
 
-
+    <section class="canvas-controls">
+        <button class="clear-canvas">Clear Canvas</button>
+        <button class="save-img">Save As Image</button>
+    </section>
 </body>
 
 </html>
