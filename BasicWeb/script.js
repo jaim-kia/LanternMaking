@@ -169,7 +169,7 @@ const drawing = (e) => {
         drawTriangle(e);
 
     } else if (selectedTool === "square") {
-        drawSquare(e);
+        drawRect(e);
     } else if (selectedTool === "hexagon") {
         drawHexagon(e);
     } else if (selectedTool === "pentagon") {
