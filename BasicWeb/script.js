@@ -1,3 +1,55 @@
+const lanternParts = {
+    top: {
+        images: [
+            "\\Assets\\Lantern\\lantern-top.png",
+            "\\Assets\\Lantern\\lantern-top_ALT.png",
+        ],
+        currentIndex: 0,
+        element: document.getElementById('lanternTop')
+    },
+    tassel: {
+        images: [
+            "\\Assets\\Lantern\\lantern-tassel-BLUE.png",
+            "\\Assets\\Lantern\\lantern-tassel-GREEN.png",
+            "\\Assets\\Lantern\\lantern-tassel-RED.png",
+        ],
+        currentIndex: 0,
+        element: document.getElementById('lanternTassel')
+    },
+    bottom: {
+        images: [
+            "\\Assets\\Lantern\\lantern-bottom.png",
+            "\\Assets\\Lantern\\lantern-bottom_ALT.png",
+        ],
+        currentIndex: 0,
+        element: document.getElementById('lanternBottom')
+    }
+};
+
+// Function to update lantern part
+function updateLanternPart(part, direction) {
+    const partData = lanternParts[part];
+    
+    if (direction === 'next') {
+        partData.currentIndex = (partData.currentIndex + 1) % partData.images.length;
+    } else {
+        partData.currentIndex = (partData.currentIndex - 1 + partData.images.length) % partData.images.length;
+    }
+    
+    const newSrc = partData.images[partData.currentIndex];
+    partData.element.src = newSrc;
+}
+
+// Add event listeners to navigation buttons
+const navButtons = document.querySelectorAll('.lantern-nav-btn');
+navButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        const part = button.getAttribute('data-part');
+        const direction = button.classList.contains('lantern-nav-right') ? 'next' : 'prev';
+        updateLanternPart(part, direction);
+    });
+});
+
 const canvas = 
     document.querySelector("canvas"),
 toolBtns = 
