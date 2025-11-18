@@ -91,11 +91,30 @@
             <img src="\Assets\Lantern\lantern-tassel.png" class="lantern-tassel">
             <img src="\Assets\Lantern\lantern-bottom.png" class="lantern-bottom">
         </section>
+        <button class="bg-nav-btn" id="prev-bg">
+            <i class="fa-solid fa-chevron-left"></i>
+        </button>
+        <button class="bg-nav-btn" id="next-bg">
+            <i class="fa-solid fa-chevron-right"></i>
+        </button>
     </div>
 
     <section class="canvas-controls">
-        <button class="clear-canvas">Clear Canvas</button>
-        <button class="save-img">Save As Image</button>
+        <button id="finish-sticker-btn" title="Convert drawing to sticker">
+            <i class="fa-solid fa-magic-wand-sparkles"></i> Make Sticker
+        </button>
+
+        <div class="sticker-dock" id="sticker-dock">
+            <span class="placeholder-text">Sticker appears here...</span>
+            </div>
+
+        <button class="clear-canvas" title="Clear Drawing">
+            <i class="fa-solid fa-trash"></i>
+        </button>
+        
+        <button id="save-scene-btn" class="save-img">
+            <i class="fa-solid fa-floppy-disk"></i> Save Scene
+        </button>
     </section>
 </body>
 
