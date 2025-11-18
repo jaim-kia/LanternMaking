@@ -36,9 +36,9 @@ const setCanvasBackground = () => {
     ctx.fillStyle = selectedColor;
 }
 
-function adjustCanvasSize() {
-    const desiredWidth = 400;
-    const desiredHeight = 300;
+function adjustCanvasSize(width = 400, height = 300) {
+    const desiredWidth = width;
+    const desiredHeight = height;
 
     canvas.width = desiredWidth;
     canvas.height = desiredHeight;
@@ -455,6 +455,14 @@ function updateCanvasShape() {
     // Add current shape class
     canvas.classList.add(`shape-${shape}`);
     
+    if (shape === 'roundish') {
+        adjustCanvasSize(); // Width, Height for roundish
+    } else if (shape === 'rectangular') {
+        adjustCanvasSize(400, 450); // Width, Height for rectangular
+    } else if (shape === 'hexagonal') {
+        adjustCanvasSize(400, 300); // Width, Height for hexagonal
+    }
+
     // Update lantern image positions with animation
     const positions = shapePositions[shape];
     if (lanternTop) lanternTop.style.top = positions.top;
@@ -504,7 +512,7 @@ finishStickerBtn.addEventListener("click", () => {
 
         // 3. Calculate Crop (Same as before)
         const captureWidth = 400;  
-        const captureHeight = 1200; 
+        const captureHeight = 2000; 
         const startX = (drawingBoard.offsetWidth / 2) - (captureWidth / 2);
         const startY = (drawingBoard.offsetHeight / 2) - (captureHeight / 2);
 

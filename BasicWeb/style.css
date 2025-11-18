@@ -203,11 +203,16 @@ canvas.shape-roundish {
 }
 
 .shape-btn-left {
-    margin-right: 500px;
+    /* margin-right: 500px; */
+    left: 50%;
+    margin-left: -270px;
 }
 
 .shape-btn-right {
-    margin-left: 500px;
+    /* margin-left: 500px; */
+    margin-left: 220px;
+    left: 50%;
+
 }
 
 /* Lantern images positioned relative to the canvas */
