@@ -33,23 +33,6 @@ const setCanvasBackground = () => {
 }
 
 function adjustCanvasSize() {
-    // const board = canvas.parentElement;
-    // const availH = board.clientHeight;
-    // const availW = board.clientWidth;
-    // const targetRatio = 4 / 3;
-
-    // const maxWidthFraction = 0.85; // 85% of parent width
-    // const maxAllowedWidth = Math.round(availW * maxWidthFraction);
-
-    // const desiredWidth = Math.min(availW, Math.round(availH * targetRatio));
-    // const desiredHeight = Math.round(desiredWidth / targetRatio);
-
-    // canvas.width = desiredWidth;
-    // canvas.height = desiredHeight;
-    // canvas.style.width = desiredWidth + "px";
-    // canvas.style.height = desiredHeight + "px";
-
-
     const desiredWidth = 400;
     const desiredHeight = 300;
 
@@ -69,9 +52,6 @@ window.addEventListener("load", () => {
         selectedColor = initSwatch.dataset.color || window.getComputedStyle(initSwatch).getPropertyValue('background-color');
     }
 });
-
-
-
 
 
 const drawRect = (e) => {
@@ -274,6 +254,53 @@ function rgbToHex(color) {
     if (!m) return color;
     return '#' + [1,2,3].map(i => parseInt(m[i]).toString(16).padStart(2,'0')).join('');
 }
+
+const backgroundFiles = [
+    "default",
+    "bg-1.png",
+    "bg-2.png",
+];
+
+const bgFolderPath = "../Assets/Backgrounds/";
+let currentBgIndex = 0;
+const drawingBoard = document.querySelector(".drawing-board");
+const prevBgBtn = document.querySelector("#prev-bg");
+const nextBgBtn = document.querySelector("#next-bg");
+
+const updateBackground = () => {
+    const fileName = backgroundFiles[currentBgIndex];
+
+    if (fileName === "default") {
+        // Reset to the solid green color
+        drawingBoard.style.backgroundImage = "none";
+        drawingBoard.style.backgroundColor = "#AA361A";
+    } else {
+        // Set the image
+        // Note: We use replace to handle spaces in filenames if necessary
+        drawingBoard.style.backgroundImage = `url('${bgFolderPath}${fileName}')`;
+        console.log(`Set background to: ${bgFolderPath}${fileName}`);
+    }
+};
+
+// Event Listener for Next Button
+nextBgBtn.addEventListener("click", () => {
+    currentBgIndex++;
+    // If we reach the end, loop back to start
+    if (currentBgIndex >= backgroundFiles.length) {
+        currentBgIndex = 0;
+    }
+    updateBackground();
+});
+
+// Event Listener for Previous Button
+prevBgBtn.addEventListener("click", () => {
+    currentBgIndex--;
+    // If we go below 0, loop to the end
+    if (currentBgIndex < 0) {
+        currentBgIndex = backgroundFiles.length - 1;
+    }
+    updateBackground();
+});
 
 
 // Custom Color Manager Class
