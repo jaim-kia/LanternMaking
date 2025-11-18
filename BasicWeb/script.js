@@ -548,6 +548,7 @@ finishStickerBtn.addEventListener("click", () => {
     
     // Group the elements we want to hide/show (Canvas + Lantern Images)
     const drawingElements = document.querySelectorAll("canvas, .lantern-top, .lantern-tassel, .lantern-bottom");
+    const shapeButtons = document.querySelectorAll("#shape-prev, #shape-next");
 
     if (!isStickerMode) {
         // === MODE: TURN INTO STICKER ===
@@ -555,6 +556,8 @@ finishStickerBtn.addEventListener("click", () => {
         // 1. Temporarily hide arrows for capture
         document.querySelector("#prev-bg").style.display = "none";
         document.querySelector("#next-bg").style.display = "none";
+        document.querySelectorAll(".lantern-nav-group").forEach(el => el.style.display = "none");
+        shapeButtons.forEach(btn => btn.style.display = "none");
 
         // 2. Prepare Background for capture
         const originalBg = drawingBoard.style.backgroundImage;
@@ -563,8 +566,8 @@ finishStickerBtn.addEventListener("click", () => {
         drawingBoard.style.backgroundColor = "transparent";
 
         // 3. Calculate Crop (Same as before)
-        const captureWidth = 400;  
-        const captureHeight = 2000; 
+        const captureWidth = 600;  
+        const captureHeight = 1500; 
         const startX = (drawingBoard.offsetWidth / 2) - (captureWidth / 2);
         const startY = (drawingBoard.offsetHeight / 2) - (captureHeight / 2);
 
@@ -616,6 +619,8 @@ finishStickerBtn.addEventListener("click", () => {
 
         // 2. Show Drawing Elements again
         drawingElements.forEach(el => el.style.display = "block"); // Or "initial"
+        document.querySelectorAll(".lantern-nav-group").forEach(el => el.style.display = "flex");
+        shapeButtons.forEach(btn => btn.style.display = "flex");
 
         // 3. Change Button back to "Make Sticker"
         finishStickerBtn.innerHTML = '<i class="fa-solid fa-magic-wand-sparkles"></i> Make Sticker';
