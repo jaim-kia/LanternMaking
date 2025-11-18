@@ -413,3 +413,205 @@ saveImage.addEventListener("click", () => {
 canvas.addEventListener("mousedown", startDraw);
 canvas.addEventListener("mousemove", drawing);
 canvas.addEventListener("mouseup", () => isDrawing = false);
+
+
+// sticker and scene logic
+const finishStickerBtn = document.querySelector("#finish-sticker-btn");
+const stickerDock = document.querySelector("#sticker-dock");
+const saveSceneBtn = document.querySelector("#save-scene-btn");
+let currentStickerSrc = null; // Stores the dataURL of the current lantern
+
+let isStickerMode = false; // State variable to track the toggle
+
+finishStickerBtn.addEventListener("click", () => {
+    
+    // Group the elements we want to hide/show (Canvas + Lantern Images)
+    const drawingElements = document.querySelectorAll("canvas, .lantern-top, .lantern-tassel, .lantern-bottom");
+
+    if (!isStickerMode) {
+        // === MODE: TURN INTO STICKER ===
+        
+        // 1. Temporarily hide arrows for capture
+        document.querySelector("#prev-bg").style.display = "none";
+        document.querySelector("#next-bg").style.display = "none";
+
+        // 2. Prepare Background for capture
+        const originalBg = drawingBoard.style.backgroundImage;
+        const originalBgColor = drawingBoard.style.backgroundColor;
+        drawingBoard.style.backgroundImage = "none";
+        drawingBoard.style.backgroundColor = "transparent";
+
+        // 3. Calculate Crop (Same as before)
+        const captureWidth = 400;  
+        const captureHeight = 1200; 
+        const startX = (drawingBoard.offsetWidth / 2) - (captureWidth / 2);
+        const startY = (drawingBoard.offsetHeight / 2) - (captureHeight / 2);
+
+        // 4. Run Capture
+        html2canvas(drawingBoard, {
+            backgroundColor: null,
+            x: startX,
+            y: startY,
+            width: captureWidth,
+            height: captureHeight,
+            scale: 2
+        }).then(canvas => {
+            // Generate Sticker Image
+            currentStickerSrc = canvas.toDataURL("image/png");
+            
+            // Restore Background & Arrows
+            if(originalBg) drawingBoard.style.backgroundImage = originalBg;
+            drawingBoard.style.backgroundColor = originalBgColor;
+            document.querySelector("#prev-bg").style.display = "flex";
+            document.querySelector("#next-bg").style.display = "flex";
+
+            // Put in Dock
+            stickerDock.innerHTML = ""; 
+            const img = document.createElement("img");
+            img.src = currentStickerSrc;
+            img.classList.add("dock-sticker");
+            img.title = "Drag me to the background!";
+            img.addEventListener("mousedown", startDragSticker);
+            stickerDock.appendChild(img);
+
+            // --- NEW: HIDE DRAWING ELEMENTS ---
+            drawingElements.forEach(el => el.style.display = "none");
+
+            // Change Button to "Make New"
+            finishStickerBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Make New Sticker';
+            finishStickerBtn.style.backgroundColor = "#4CAF50"; // Optional: Change color to Green
+            finishStickerBtn.style.color = "white";
+
+            // Update State
+            isStickerMode = true;
+        });
+
+    } else {
+        // === MODE: MAKE NEW STICKER (RESET) ===
+
+        // 1. Clear the previous drawing
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        setCanvasBackground(); // Helper function from your code to reset white/color bg
+
+        // 2. Show Drawing Elements again
+        drawingElements.forEach(el => el.style.display = "block"); // Or "initial"
+
+        // 3. Change Button back to "Make Sticker"
+        finishStickerBtn.innerHTML = '<i class="fa-solid fa-magic-wand-sparkles"></i> Make Sticker';
+        finishStickerBtn.style.backgroundColor = ""; // Reset color
+        finishStickerBtn.style.color = "";
+
+        // Update State
+        isStickerMode = false;
+    }
+});
+
+// 2. DRAG AND DROP LOGIC
+function startDragSticker(e) {
+    e.preventDefault();
+    
+    // Create a "Ghost" sticker that follows mouse
+    const ghost = document.createElement("img");
+    ghost.src = currentStickerSrc;
+    ghost.classList.add("placed-sticker");
+    ghost.style.width = "100px"; // Smaller while dragging
+    ghost.style.opacity = "0.7";
+    ghost.style.pointerEvents = "none"; // Let mouse events pass through to board
+    ghost.style.position = "fixed"; // Fixed relative to viewport
+    ghost.style.left = e.clientX + "px";
+    ghost.style.top = e.clientY + "px";
+    ghost.style.transform = "translate(-50%, -50%)"; // Center on mouse
+    
+    document.body.appendChild(ghost);
+
+    function moveGhost(event) {
+        ghost.style.left = event.clientX + "px";
+        ghost.style.top = event.clientY + "px";
+    }
+
+    function dropSticker(event) {
+        // Remove listeners
+        document.removeEventListener("mousemove", moveGhost);
+        document.removeEventListener("mouseup", dropSticker);
+        ghost.remove(); // Remove the ghost
+
+        // Calculate if we dropped it INSIDE the drawing board
+        const boardRect = drawingBoard.getBoundingClientRect();
+        
+        // Check boundaries
+        if (
+            event.clientX >= boardRect.left &&
+            event.clientX <= boardRect.right &&
+            event.clientY >= boardRect.top &&
+            event.clientY <= boardRect.bottom
+        ) {
+            // CREATE PERMANENT STICKER
+            const newSticker = document.createElement("img");
+            newSticker.src = currentStickerSrc;
+            newSticker.classList.add("placed-sticker");
+            
+            // Calculate position relative to the board container
+            // (Current Mouse X - Board Left Edge)
+            const relativeX = event.clientX - boardRect.left;
+            const relativeY = event.clientY - boardRect.top;
+
+            newSticker.style.left = relativeX + "px";
+            newSticker.style.top = relativeY + "px";
+            newSticker.style.transform = "translate(-50%, -50%)"; // Center image on coordinate
+
+            // Optional: Allow the placed sticker to be dragged again (repositioning)
+            addRepositionLogic(newSticker);
+
+            drawingBoard.appendChild(newSticker);
+        }
+    }
+
+    document.addEventListener("mousemove", moveGhost);
+    document.addEventListener("mouseup", dropSticker);
+}
+
+// Helper to move stickers AFTER they are placed
+function addRepositionLogic(element) {
+    element.addEventListener("mousedown", (e) => {
+        e.stopPropagation(); // Don't draw on canvas
+        e.preventDefault();
+
+        let startX = e.clientX;
+        let startY = e.clientY;
+        let elemLeft = element.offsetLeft;
+        let elemTop = element.offsetTop;
+
+        function moveElem(ev) {
+            let dx = ev.clientX - startX;
+            let dy = ev.clientY - startY;
+            element.style.left = (elemLeft + dx) + "px";
+            element.style.top = (elemTop + dy) + "px";
+        }
+
+        function stopMove() {
+            document.removeEventListener("mousemove", moveElem);
+            document.removeEventListener("mouseup", stopMove);
+        }
+
+        document.addEventListener("mousemove", moveElem);
+        document.addEventListener("mouseup", stopMove);
+    });
+}
+
+// 3. SAVE FINAL SCENE
+saveSceneBtn.addEventListener("click", () => {
+    // Hide arrows again for clean save
+    document.querySelector("#prev-bg").style.display = "none";
+    document.querySelector("#next-bg").style.display = "none";
+
+    html2canvas(drawingBoard).then(domCanvas => {
+        const link = document.createElement('a');
+        link.download = `lantern-scene-${Date.now()}.png`;
+        link.href = domCanvas.toDataURL('image/png');
+        link.click();
+
+        // Show arrows back
+        document.querySelector("#prev-bg").style.display = "flex";
+        document.querySelector("#next-bg").style.display = "flex";
+    });
+});
