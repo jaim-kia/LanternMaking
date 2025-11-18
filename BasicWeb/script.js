@@ -18,6 +18,10 @@ ctx = canvas.getContext("2d");
 
 let frameImg = null;
 
+// Shape management
+let currentShapeIndex = 0;
+const shapes = ['roundish', 'rectangular', 'hexagonal'];
+
 //global variabels wiht default values
 let prevMouseX, prevMouseY, snapshot,
     isDrawing = false,
@@ -33,23 +37,6 @@ const setCanvasBackground = () => {
 }
 
 function adjustCanvasSize() {
-    // const board = canvas.parentElement;
-    // const availH = board.clientHeight;
-    // const availW = board.clientWidth;
-    // const targetRatio = 4 / 3;
-
-    // const maxWidthFraction = 0.85; // 85% of parent width
-    // const maxAllowedWidth = Math.round(availW * maxWidthFraction);
-
-    // const desiredWidth = Math.min(availW, Math.round(availH * targetRatio));
-    // const desiredHeight = Math.round(desiredWidth / targetRatio);
-
-    // canvas.width = desiredWidth;
-    // canvas.height = desiredHeight;
-    // canvas.style.width = desiredWidth + "px";
-    // canvas.style.height = desiredHeight + "px";
-
-
     const desiredWidth = 400;
     const desiredHeight = 300;
 
@@ -70,12 +57,7 @@ window.addEventListener("load", () => {
     }
 });
 
-
-
-
-
 const drawRect = (e) => {
-
     // If fillColor isn't checked draw a react wiht 
     // border else draw rect wiht backgorund
     if (!fillColor.checked) {
@@ -148,8 +130,6 @@ const pickColor = (e) => {
     selectedTool = previousTool;
 }
 
-
-
 const startDraw = (e) => {
     // If eyedropper, just pick the color and don't start drawing
     if (selectedTool === "eyedropper") {
@@ -168,12 +148,10 @@ const startDraw = (e) => {
     canvas.height);
 }
 
-
 const drawPencil = (e) => {
     ctx.lineTo(e.offsetX, e.offsetY);
     ctx.stroke();
 }
-
 
 const drawing = (e) => {
     if (!isDrawing) return;
@@ -216,7 +194,6 @@ const drawing = (e) => {
 
     }
 }
-
 
 toolBtns.forEach(btn => {
     btn.addEventListener("click", () => {
@@ -274,7 +251,6 @@ function rgbToHex(color) {
     if (!m) return color;
     return '#' + [1,2,3].map(i => parseInt(m[i]).toString(16).padStart(2,'0')).join('');
 }
-
 
 // Custom Color Manager Class
 class CustomColorManager {
@@ -386,3 +362,67 @@ saveImage.addEventListener("click", () => {
 canvas.addEventListener("mousedown", startDraw);
 canvas.addEventListener("mousemove", drawing);
 canvas.addEventListener("mouseup", () => isDrawing = false);
+
+// Shape changing functionality
+const shapePrevBtn = document.querySelector('#shape-prev');
+const shapeNextBtn = document.querySelector('#shape-next');
+const lanternTop = document.querySelector('.lantern-top');
+const lanternBottom = document.querySelector('.lantern-bottom');
+const lanternTassel = document.querySelector('.lantern-tassel');
+
+// Define position offsets for each shape
+const shapePositions = {
+    roundish: {
+        top: 'calc(50% - 450px + 100px)',
+        bottom: 'calc(50% - 450px + 465px)',
+        tassel: 'calc(50% - 450px + 500px)'
+    },
+    rectangular: {
+        top: 'calc(50% - 450px + 83px)',
+        bottom: 'calc(50% - 450px + 652px)',
+        tassel: 'calc(50% - 450px + 687px)'
+    },
+    hexagonal: {
+        top: 'calc(50% - 450px + 100px)',
+        bottom: 'calc(50% - 450px + 480px)',
+        tassel: 'calc(50% - 450px + 515px)'
+    }
+};
+
+// Add CSS transitions for smooth animation
+function initializeAnimations() {
+    const elements = [lanternTop, lanternBottom, lanternTassel];
+    elements.forEach(element => {
+        if (element) {
+            element.style.transition = 'top 0.5s ease-in-out';
+        }
+    });
+}
+
+function updateCanvasShape() {
+    const shape = shapes[currentShapeIndex];
+    // Remove all shape classes
+    canvas.classList.remove('shape-roundish', 'shape-rectangular', 'shape-hexagonal');
+    // Add current shape class
+    canvas.classList.add(`shape-${shape}`);
+    
+    // Update lantern image positions with animation
+    const positions = shapePositions[shape];
+    if (lanternTop) lanternTop.style.top = positions.top;
+    if (lanternBottom) lanternBottom.style.top = positions.bottom;
+    if (lanternTassel) lanternTassel.style.top = positions.tassel;
+}
+
+// Initialize animations and shape
+initializeAnimations();
+updateCanvasShape();
+
+shapePrevBtn.addEventListener('click', () => {
+    currentShapeIndex = (currentShapeIndex - 1 + shapes.length) % shapes.length;
+    updateCanvasShape();
+});
+
+shapeNextBtn.addEventListener('click', () => {
+    currentShapeIndex = (currentShapeIndex + 1) % shapes.length;
+    updateCanvasShape();
+});
