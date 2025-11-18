@@ -474,6 +474,7 @@ shapePrevBtn.addEventListener('click', () => {
 shapeNextBtn.addEventListener('click', () => {
     currentShapeIndex = (currentShapeIndex + 1) % shapes.length;
     updateCanvasShape();
+});
 
 // sticker and scene logic
 const finishStickerBtn = document.querySelector("#finish-sticker-btn");
