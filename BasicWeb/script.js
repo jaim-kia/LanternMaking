@@ -16,6 +16,8 @@ saveImage =
     document.querySelector(".save-img"),
 ctx = canvas.getContext("2d");
 
+let frameImg = null;
+
 //global variabels wiht default values
 let prevMouseX, prevMouseY, snapshot,
     isDrawing = false,
@@ -30,21 +32,47 @@ const setCanvasBackground = () => {
     ctx.fillStyle = selectedColor;
 }
 
-window.addEventListener("load", () => {
-    
-    // Setting canvas widht/height.. 
-    // offsetwidht/height returns 
-    // viewbale widht/height of an element
-    
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
+function adjustCanvasSize() {
+    // const board = canvas.parentElement;
+    // const availH = board.clientHeight;
+    // const availW = board.clientWidth;
+    // const targetRatio = 4 / 3;
+
+    // const maxWidthFraction = 0.85; // 85% of parent width
+    // const maxAllowedWidth = Math.round(availW * maxWidthFraction);
+
+    // const desiredWidth = Math.min(availW, Math.round(availH * targetRatio));
+    // const desiredHeight = Math.round(desiredWidth / targetRatio);
+
+    // canvas.width = desiredWidth;
+    // canvas.height = desiredHeight;
+    // canvas.style.width = desiredWidth + "px";
+    // canvas.style.height = desiredHeight + "px";
+
+
+    const desiredWidth = 400;
+    const desiredHeight = 300;
+
+    canvas.width = desiredWidth;
+    canvas.height = desiredHeight;
+
+    canvas.style.width = desiredWidth + "px";
+    canvas.style.height = desiredHeight + "px";
     setCanvasBackground();
+}
+
+window.addEventListener("load", () => {
+   adjustCanvasSize();
     // initialize selectedColor from toolbar swatch if present
     const initSwatch = document.querySelector('.toolbar-color.selected');
     if (initSwatch) {
         selectedColor = initSwatch.dataset.color || window.getComputedStyle(initSwatch).getPropertyValue('background-color');
     }
 });
+
+
+
+
 
 const drawRect = (e) => {
 
@@ -326,10 +354,31 @@ saveImage.addEventListener("click", () => {
             console.error('html2canvas error:', err);
         });
     } else {
-        // fallback to exporting only the raw canvas
+        // fallback to exporting only the raw canvas but composite frame if present
+        const exportCanvas = document.createElement('canvas');
+        exportCanvas.width = canvas.width;
+        exportCanvas.height = canvas.height;
+        const ectx = exportCanvas.getContext('2d');
+
+        // white background
+        ectx.fillStyle = '#fff';
+        ectx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+
+        // draw user canvas
+        ectx.drawImage(canvas, 0, 0, exportCanvas.width, exportCanvas.height);
+
+        // if a frame overlay exists, draw it over the canvas
+        if (frameImg && frameImg.complete) {
+            try {
+                ectx.drawImage(frameImg, 0, 0, exportCanvas.width, exportCanvas.height);
+            } catch (err) {
+                console.warn('Could not draw frame onto export canvas:', err);
+            }
+        }
+
         const link = document.createElement("a");
         link.download = `lantern-${Date.now()}.png`;
-        link.href = canvas.toDataURL("image/png");
+        link.href = exportCanvas.toDataURL("image/png");
         link.click();
     }
 })
