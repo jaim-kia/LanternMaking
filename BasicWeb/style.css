@@ -164,13 +164,11 @@ canvas {
 
 canvas.shape-rectangular {
     border-radius: 20px;
-    height: 450px !important;
     clip-path: none;
 }
 
 canvas.shape-hexagonal {
     border-radius: 0;
-    height: 300px !important;
     clip-path: polygon(20% 0%, 80% 0%, 100% 50%, 84% 100%, 16% 100%, 0% 50%);
 }
 
@@ -202,12 +200,46 @@ canvas.shape-roundish {
     transform: scale(1.1);
 }
 
-.shape-btn-left {
-    margin-right: 500px;
+.shape-btn-left, .lantern-nav-left {
+    /* margin-right: 500px; */
+    left: 50%;
+    margin-left: -270px;
 }
 
-.shape-btn-right {
-    margin-left: 500px;
+.shape-btn-right, .lantern-nav-right {
+    /* margin-left: 500px; */
+    margin-left: 220px;
+    left: 50%;
+
+}
+
+.lantern-nav-btn {
+    position: absolute;
+    /* top: calc(50% - 125px); */
+    background-color: #ddd;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 3;
+    font-size: 20px;
+    color: #333;
+    transition: all 0.2s ease;
+}
+
+.lantern-button-top {
+    top: calc(50% - 450px + 150px);
+}
+
+.lantern-button-bottom {
+    top: calc(50% - 450px + 500px);
+}
+
+.lantern-button-tassel {
+    top: calc(50% - 450px + 800px);
 }
 
 /* Lantern images positioned relative to the canvas */
