@@ -1,25 +1,26 @@
 const lanternParts = {
     top: {
         images: [
-            "/Assets/Lantern/lantern-top.png",
-            "/Assets/Lantern/lantern-top_ALT.png",
+            "Assets/Lantern/lantern-top.png",
+            "Assets/Lantern/lantern-top_ALT.png",
         ],
         currentIndex: 0,
         element: document.getElementById('lanternTop')
     },
     tassel: {
         images: [
-            "/Assets/Lantern/lantern-tassel-BLUE.png",
-            "/Assets/Lantern/lantern-tassel-GREEN.png",
-            "/Assets/Lantern/lantern-tassel-RED.png",
+            "Assets/Lantern/lantern-tassel-BLUE.png",
+            "Assets/Lantern/lantern-tassel-GREEN.png",
+            "Assets/Lantern/lantern-tassel-RED.png",
+            "Assets/Lantern/lantern-tassle2.png",
         ],
         currentIndex: 0,
         element: document.getElementById('lanternTassel')
     },
     bottom: {
         images: [
-            "/Assets/Lantern/lantern-bottom.png",
-            "/Assets/Lantern/lantern-bottom_ALT.png",
+            "Assets/Lantern/lantern-bottom.png",
+            "Assets/Lantern/lantern-bottom_ALT.png",
         ],
         currentIndex: 0,
         element: document.getElementById('lanternBottom')
@@ -311,7 +312,7 @@ const backgroundFiles = [
     "bg-2.png",
 ];
 
-const bgFolderPath = "../Assets/Backgrounds/";
+const bgFolderPath = "Assets/Backgrounds/";
 let currentBgIndex = 0;
 const drawingBoard = document.querySelector(".drawing-board");
 const prevBgBtn = document.querySelector("#prev-bg");
