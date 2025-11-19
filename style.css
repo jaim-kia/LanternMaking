@@ -169,7 +169,7 @@ canvas.shape-rectangular {
 
 canvas.shape-hexagonal {
     border-radius: 0;
-    clip-path: polygon(20% 0%, 80% 0%, 100% 50%, 84% 100%, 16% 100%, 0% 50%);
+    clip-path: polygon(18% 0%, 82% 0%, 100% 50%, 87% 100%, 13% 100%, 0% 50%);
 }
 
 canvas.shape-roundish {

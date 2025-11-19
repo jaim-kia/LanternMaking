@@ -485,9 +485,9 @@ const shapePositions = {
         tassel: 'calc(50% - 450px + 687px)'
     },
     hexagonal: {
-        top: 'calc(50% - 450px + 100px)',
-        bottom: 'calc(50% - 450px + 480px)',
-        tassel: 'calc(50% - 450px + 515px)'
+        top: 'calc(50% - 450px + 82px)',
+        bottom: 'calc(50% - 450px + 451px)',
+        tassel: 'calc(50% - 450px + 486px)'
     }
 };
 
@@ -513,7 +513,7 @@ function updateCanvasShape() {
     } else if (shape === 'rectangular') {
         adjustCanvasSize(400, 450); // Width, Height for rectangular
     } else if (shape === 'hexagonal') {
-        adjustCanvasSize(400, 300); // Width, Height for hexagonal
+        adjustCanvasSize(400, 250); // Width, Height for hexagonal
     }
 
     // Update lantern image positions with animation
@@ -567,7 +567,7 @@ finishStickerBtn.addEventListener("click", () => {
         drawingBoard.style.backgroundColor = "transparent";
 
         // 3. Calculate Crop (Same as before)
-        const captureWidth = 600;  
+        const captureWidth = 400;  
         const captureHeight = 1500; 
         const startX = (drawingBoard.offsetWidth / 2) - (captureWidth / 2);
         const startY = (drawingBoard.offsetHeight / 2) - (captureHeight / 2);
@@ -580,37 +580,95 @@ finishStickerBtn.addEventListener("click", () => {
             width: captureWidth,
             height: captureHeight,
             scale: 2
-        }).then(canvas => {
-            // Generate Sticker Image
-            currentStickerSrc = canvas.toDataURL("image/png");
+        }).then(boardCanvas => {
+            const drawCanvas = drawingBoard.querySelector('canvas');
+            const isHexagonal = drawCanvas.classList.contains('shape-hexagonal');
             
-            // Restore Background & Arrows
-            if(originalBg) drawingBoard.style.backgroundImage = originalBg;
-            drawingBoard.style.backgroundColor = originalBgColor;
-            document.querySelector("#prev-bg").style.display = "flex";
-            document.querySelector("#next-bg").style.display = "flex";
-
-            // Put in Dock
-            stickerDock.innerHTML = ""; 
-            const img = document.createElement("img");
-            img.src = currentStickerSrc;
-            img.classList.add("dock-sticker");
-            img.title = "Drag me to the background!";
-            img.addEventListener("mousedown", startDragSticker);
-            stickerDock.appendChild(img);
-
-            // --- NEW: HIDE DRAWING ELEMENTS ---
-            drawingElements.forEach(el => el.style.display = "none");
-
-            // Change Button to "Make New"
-            finishStickerBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Make New Sticker';
-            finishStickerBtn.style.backgroundColor = "#4CAF50"; // Optional: Change color to Green
-            finishStickerBtn.style.color = "white";
-
-            // Update State
-            isStickerMode = true;
+            if (isHexagonal) {
+                // Capture just the canvas element
+                html2canvas(drawCanvas, {
+                    backgroundColor: null,
+                    scale: 2
+                }).then(canvasCapture => {
+                    // Apply hexagonal clipping to the canvas capture
+                    const clippedCanvas = document.createElement('canvas');
+                    clippedCanvas.width = canvasCapture.width;
+                    clippedCanvas.height = canvasCapture.height;
+                    const ctx = clippedCanvas.getContext('2d');
+                    
+                    // Define hexagon path
+                    const w = canvasCapture.width;
+                    const h = canvasCapture.height;
+                    ctx.beginPath();
+                    ctx.moveTo(w * 0.20, 0);
+                    ctx.lineTo(w * 0.80, 0);
+                    ctx.lineTo(w, h * 0.50);
+                    ctx.lineTo(w * 0.84, h);
+                    ctx.lineTo(w * 0.16, h);
+                    ctx.lineTo(0, h * 0.50);
+                    ctx.closePath();
+                    ctx.clip();
+                    
+                    // Draw the canvas capture with hexagonal clip
+                    ctx.drawImage(canvasCapture, 0, 0);
+                    
+                    // Now composite: draw boardCanvas, then overlay clipped canvas
+                    const finalCanvas = document.createElement('canvas');
+                    finalCanvas.width = boardCanvas.width;
+                    finalCanvas.height = boardCanvas.height;
+                    const finalCtx = finalCanvas.getContext('2d');
+                    
+                    // Draw the full board capture (lantern parts included)
+                    finalCtx.drawImage(boardCanvas, 0, 0);
+                    
+                    // Calculate where to place the clipped canvas
+                    const canvasRect = drawCanvas.getBoundingClientRect();
+                    const boardRect = drawingBoard.getBoundingClientRect();
+                    const canvasX = (canvasRect.left - boardRect.left - startX) * 2;
+                    const canvasY = (canvasRect.top - boardRect.top - startY) * 2;
+                    
+                    // Clear the original canvas area and draw the clipped version
+                    finalCtx.clearRect(canvasX, canvasY, clippedCanvas.width, clippedCanvas.height);
+                    finalCtx.drawImage(clippedCanvas, canvasX, canvasY);
+                    
+                    currentStickerSrc = finalCanvas.toDataURL("image/png");
+                    
+                    // Continue with rest of code (restore background, update dock, etc.)
+                    continueAfterCapture();
+                });
+            } else {
+                currentStickerSrc = boardCanvas.toDataURL("image/png");
+                continueAfterCapture();
+            }
+            
+            function continueAfterCapture() {
+                // Restore Background & Arrows
+                if(originalBg) drawingBoard.style.backgroundImage = originalBg;
+                drawingBoard.style.backgroundColor = originalBgColor;
+                document.querySelector("#prev-bg").style.display = "flex";
+                document.querySelector("#next-bg").style.display = "flex";
+                
+                // Put in Dock
+                stickerDock.innerHTML = ""; 
+                const img = document.createElement("img");
+                img.src = currentStickerSrc;
+                img.classList.add("dock-sticker");
+                img.title = "Drag me to the background!";
+                img.addEventListener("mousedown", startDragSticker);
+                stickerDock.appendChild(img);
+                
+                // Hide Drawing Elements
+                drawingElements.forEach(el => el.style.display = "none");
+                
+                // Change Button to "Make New"
+                finishStickerBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Make New Sticker';
+                finishStickerBtn.style.backgroundColor = "#4CAF50";
+                finishStickerBtn.style.color = "white";
+                
+                // Update State
+                isStickerMode = true;
+            }
         });
-
     } else {
         // === MODE: MAKE NEW STICKER (RESET) ===
 
