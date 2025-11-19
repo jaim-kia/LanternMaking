@@ -239,7 +239,7 @@ canvas.shape-roundish {
 }
 
 .lantern-button-tassel {
-    top: calc(50% - 450px + 800px);
+    top: calc(50% - 450px + 600px);
 }
 
 /* Lantern images positioned relative to the canvas */
