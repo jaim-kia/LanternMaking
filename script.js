@@ -219,7 +219,7 @@ const drawing = (e) => {
     || selectedTool === "eraser") {
 
         ctx.strokeStyle = selectedTool === "eraser" 
-        ? "#fff" : selectedColor;
+        ? "#f5eddcff" : selectedColor;
         ctx.lineTo(e.offsetX, e.offsetY);
         ctx.stroke();
     } else if (selectedTool === "rectangle") {
