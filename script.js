@@ -15,7 +15,8 @@ const lanternParts = {
             "Assets/Lantern/lantern-tassle2.png",
             "Assets/Lantern/lantern-tassel2-BLUE.png",
             "Assets/Lantern/lantern-tassel2-GREEN.png",
-            "Assets/Lantern/lantern-tasseL2-RED.png",
+            "Assets/Lantern/lantern-tassel2-RED.png",
+            "no tassel",
         ],
         currentIndex: 0,
         element: document.getElementById('lanternTassel')
