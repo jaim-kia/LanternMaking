@@ -13,6 +13,9 @@ const lanternParts = {
             "Assets/Lantern/lantern-tassel-GREEN.png",
             "Assets/Lantern/lantern-tassel-RED.png",
             "Assets/Lantern/lantern-tassle2.png",
+            "Assets/Lantern/lantern-tassel2-BLUE.png",
+            "Assets/Lantern/lantern-tassel2-GREEN.png",
+            "Assets/Lantern/lantern-tasseL2-RED.png",
         ],
         currentIndex: 0,
         element: document.getElementById('lanternTassel')
@@ -310,6 +313,7 @@ const backgroundFiles = [
     "default",
     "bg-1.png",
     "bg-2.png",
+    "bg-3.png",
 ];
 
 const bgFolderPath = "Assets/Backgrounds/";
